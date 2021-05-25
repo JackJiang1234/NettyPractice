@@ -30,13 +30,16 @@ public class RedisServer {
                                     .addLast(new RedisCommandHandler());
                         }
                     });
-            ChannelFuture future = bootstrap.bind().addListener(new GenericFutureListener<Future<? super Void>>() {
-                @Override
-                public void operationComplete(Future<? super Void> future) throws Exception {
-                    System.out.println("server start successful.");
-                }
-            });
-            future.sync();
+            ChannelFuture future = bootstrap
+                    .bind()
+                    .addListener(future1 -> {
+                        if (future1.isSuccess()) {
+                            System.out.println("server start successful.");
+                        } else {
+                            System.out.println("server stat fail. " + future1.cause());
+                        }
+                    })
+                    .sync();
             future.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully();
